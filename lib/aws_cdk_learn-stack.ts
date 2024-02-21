@@ -14,8 +14,8 @@ export class AwsCdkLearnStack extends cdk.Stack {
       synth: new ShellStep('Synth', {
         input: source,
         commands: ['chmod 777 build_python.sh',
-          './build_python.sh',
-          'npm ci', 'npm run build', 'npx cdk synth'],
+          'sh build_python.sh',
+          'npm ci', 'npm run build', 'npm test', 'npx cdk synth'],
       }),
     });
 
