@@ -37,6 +37,8 @@ Create a cicd pipeline template to deploy typical infra required for a DE projec
 8. add integration tests
 9. add prod stage
 
-## Usefull Notes
+## Useful Notes
 
 1. lambda runtime settings much match with runtime of libraries installed during lambda packaging/ zip file creation. eg: If you use pandas in your python code, the lambda runtime is x86_64 and you are working on windows/mac, make sure to install linux binaries for pandas during packaging. Windows/Mac binaries for pandas will not work on x86_64. (Refer to build_python.sh)
+
+2. When making any changes to pipeline, make sure to do cdk deploy pipeline stack from local first before commiting your changes to git. For some reason, the commands I add to synth steps will not run until I update the pipeline from local first.
