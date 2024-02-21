@@ -4,7 +4,7 @@ import { Construct } from 'constructs';
 import { PipelineStage } from '../Stacks/PipelineStage';
 
 export class AwsCdkLearnStack extends cdk.Stack {
-  constructor(scope: Construct, id: string, props?: cdk.StackProps) {
+  constructor(scope: Construct, id: string, props: cdk.StackProps) {
     super(scope, id, props);
 
     const source = CodePipelineSource.gitHub('bharath-t/AwsCdkLearn', 'main');
@@ -13,12 +13,15 @@ export class AwsCdkLearnStack extends cdk.Stack {
       pipelineName: 'TestPipeline',
       synth: new ShellStep('Synth', {
         input: source,
-        commands: ['npm ci', 'npm run build', 'npx cdk synth'],
+        commands: ['chmod 777 build_python.sh',
+          './build_python.sh',
+          'npm ci', 'npm run build', 'npx cdk synth'],
       }),
     });
 
     const betaStage = new PipelineStage(this, 'betaStage', {
-      stageName: 'Beta'
+      stageName: 'Beta',
+      env: props.env
     })
 
     pipeline.addStage(betaStage);

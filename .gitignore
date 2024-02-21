@@ -6,3 +6,51 @@ node_modules
 # CDK asset staging directory
 .cdk.staging
 cdk.out
+
+# python git ignore files
+
+# Ignore virtual environments
+venv/
+env/
+virtualenv/
+
+# Ignore IDE/Editor files
+.vscode/
+.idea/
+.vs/
+
+# Ignore Python compiled files
+*.pyc
+__pycache__/
+
+# Ignore dependency management files
+# requirements.txt
+Pipfile.lock
+pipenv.lock
+
+# Ignore build artifacts
+build/
+dist/
+*.egg-info/
+
+# Ignore logs and temporary files
+*.log
+*.pot
+*.pyo
+*.swp
+.pytest_cache/
+.coverage
+
+# Ignore environment configuration files
+.env
+.env.*
+
+# Ignore Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Ignore python external libraries installed, zip file created for lambda packaging
+python_libraries/
+*.zip
+
+# file created by macOS. not required for project
+.DS_Store

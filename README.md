@@ -24,3 +24,19 @@ https://docs.aws.amazon.com/cdk/api/v2/docs/aws-cdk-lib.aws_codepipeline-readme.
 ## Purpose of this project
 
 Create a cicd pipeline template to deploy typical infra required for a DE project
+
+## Steps
+
+1. create empty git repo
+2. clone to local
+3. create new cdk app using cdk init app --language typescript
+4. create new pipeline using pipeline module in cdk app
+5. create a stage stack (Beta)
+6. add infra stack to each stage (lambda, glue job, stepfunction, ....)
+7. add python build steps (error checking + linting + test cases + bundling python scripts) as build step in pipeline stage
+8. add integration tests
+9. add prod stage
+
+## Usefull Notes
+
+1. lambda runtime settings much match with runtime of libraries installed during lambda packaging/ zip file creation. eg: If you use pandas in your python code, the lambda runtime is x86_64 and you are working on windows/mac, make sure to install linux binaries for pandas during packaging. Windows/Mac binaries for pandas will not work on x86_64. (Refer to build_python.sh)
