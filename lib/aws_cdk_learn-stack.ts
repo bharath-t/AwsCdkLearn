@@ -3,8 +3,12 @@ import { CodePipeline, CodePipelineSource, ShellStep } from 'aws-cdk-lib/pipelin
 import { Construct } from 'constructs';
 import { PipelineStage } from '../Stacks/PipelineStage';
 
+interface AwsCdkLearnStackProps extends cdk.StackProps {
+  env: cdk.Environment
+}
+
 export class AwsCdkLearnStack extends cdk.Stack {
-  constructor(scope: Construct, id: string, props: cdk.StackProps) {
+  constructor(scope: Construct, id: string, props: AwsCdkLearnStackProps) {
     super(scope, id, props);
 
     const source = CodePipelineSource.gitHub('bharath-t/AwsCdkLearn', 'main');
@@ -21,7 +25,7 @@ export class AwsCdkLearnStack extends cdk.Stack {
 
     const betaStage = new PipelineStage(this, 'betaStage', {
       stageName: 'Beta',
-      env: props.env
+      env: props.env,
     })
 
     pipeline.addStage(betaStage);

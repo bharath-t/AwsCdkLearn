@@ -42,3 +42,9 @@ Create a cicd pipeline template to deploy typical infra required for a DE projec
 1. lambda runtime settings much match with runtime of libraries installed during lambda packaging/ zip file creation. eg: If you use pandas in your python code, the lambda runtime is x86_64 and you are working on windows/mac, make sure to install linux binaries for pandas during packaging. Windows/Mac binaries for pandas will not work on x86_64. (Refer to build_python.sh)
 
 2. When making any changes to pipeline, make sure to do cdk deploy pipeline stack from local first before commiting your changes to git. For some reason, the commands I add to synth steps will not run until I update the pipeline from local first.
+
+3. Lambda code can be referenced directly using local relative path. For Glue Job, all the required files, jars, additional py files must be copied to s3 using s3 bucket deployment.
+
+## Issues
+
+1. cdk deploy creates new zip files on s3 for each deployment. I could not figure out a way using aws-cdk-lib/pipelines to delete old deployment files after each successful deployment. This will be costly eventually. useful discussion - https://github.com/aws/aws-cdk-rfcs/issues/64

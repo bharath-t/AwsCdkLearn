@@ -1,9 +1,11 @@
-import { Stage, StageProps } from "aws-cdk-lib";
+import { Environment, Stage, StageProps } from "aws-cdk-lib";
 import { Construct } from "constructs";
 import { LambdaStack } from "./LambdaStack";
 
+
 interface PipelineStageProps extends StageProps {
     stageName: string,
+    env: Environment,
 }
 
 
@@ -13,6 +15,8 @@ export class PipelineStage extends Stage {
 
         new LambdaStack(this, 'LambdaStack', {
             stageName: props.stageName,
+            env: props.env
         });
+
     }
 }
