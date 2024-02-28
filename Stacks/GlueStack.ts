@@ -92,12 +92,13 @@ export class GlueStack extends Stack {
             numberOfWorkers: 5,
         })
 
-        new aws_glue.CfnTrigger(this, 'GlueJob1Trigger', {
-            description: "scheduler for aws glue job",
-            type: "SCHEDULED",
-            startOnCreation: true,
-            actions: [{ jobName: glueJob.name }],
-            schedule: "cron(0 9 ? * MON *)",
-        })
+        // // schedule the job using cron
+        // new aws_glue.CfnTrigger(this, 'GlueJob1Trigger', {
+        //     description: "scheduler for aws glue job",
+        //     type: "SCHEDULED",
+        //     startOnCreation: true,
+        //     actions: [{ jobName: glueJob.name }],
+        //     schedule: "cron(0 9 ? * MON *)",
+        // })
     }
 }

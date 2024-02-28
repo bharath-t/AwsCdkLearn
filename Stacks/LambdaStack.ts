@@ -1,8 +1,10 @@
-import { Duration, Environment, Stack, StackProps, aws_iam, aws_lambda, aws_ecr, aws_ecr_assets, RemovalPolicy } from "aws-cdk-lib";
+import { Duration, Environment, Fn, Stack, StackProps, aws_iam } from "aws-cdk-lib";
+import { aws_lambda, aws_ecr, aws_ecr_assets, RemovalPolicy, aws_s3 } from "aws-cdk-lib";
 import { Effect } from "aws-cdk-lib/aws-iam";
 import { Construct } from "constructs";
 import * as path from 'path';
 import * as ecrdeploy from "cdk-ecr-deployment";
+import { S3EventSourceV2 } from 'aws-cdk-lib/aws-lambda-event-sources';
 
 interface LambdaStackProps extends StackProps {
     stageName: string,
@@ -15,6 +17,7 @@ export class LambdaStack extends Stack {
     public dockerimagelambda2: aws_lambda.DockerImageFunction;
     public dockerecrlambda: aws_lambda.DockerImageFunction;
 
+
     constructor(scope: Construct, id: string, props: LambdaStackProps) {
         super(scope, id, props)
 
@@ -25,6 +28,7 @@ export class LambdaStack extends Stack {
             managedPolicies: [
                 aws_iam.ManagedPolicy.fromAwsManagedPolicyName('AmazonS3FullAccess'),
                 aws_iam.ManagedPolicy.fromAwsManagedPolicyName('AWSLambda_FullAccess'),
+                aws_iam.ManagedPolicy.fromAwsManagedPolicyName('CloudWatchFullAccessV2'),
             ],
         });
 
@@ -96,6 +100,16 @@ export class LambdaStack extends Stack {
             },
             memorySize: 128,
         });
+
+        const s3DeployBucket = aws_s3.Bucket.fromBucketName(this, 'InputBucket',
+            Fn.importValue('s3DeployBucketName')
+        );
+        s3DeployBucket.grantRead(this.dockerimagelambda2);
+
+        this.dockerimagelambda2.addEventSource(new S3EventSourceV2(s3DeployBucket, {
+            events: [aws_s3.EventType.OBJECT_CREATED, aws_s3.EventType.OBJECT_REMOVED],
+            filters: [{ prefix: 'input_data/' }],
+        }));
 
 
         // create ecr repo, publish local docker image to ecr

@@ -20,15 +20,18 @@ export class PipelineStage extends Stage {
             env: props.env
         });
 
-        new s3Stack(this, 's3Stack', {
+        const s3_stack = new s3Stack(this, 's3Stack', {
             stageName: props.stageName,
             env: props.env
         })
 
-        new GlueStack(this, 'GlueStack', {
+        const glue_stack = new GlueStack(this, 'GlueStack', {
             stageName: props.stageName,
             env: props.env
         });
+
+        // deploy glue stack only after s3 deployment
+        glue_stack.node.addDependency(s3_stack);
 
     }
 }
