@@ -32,7 +32,7 @@ zip -r python_src.zip python_scripts -x "*/__pycache__/*"
 # DO NOT INCLUDE ADDITIONAL PYTHON LIBRARIES, USE addition-python-modules param instead
 cd python_scripts
 zip -r gluezip.zip src -x "*/__pycache__/*"
-
+cd ..
 
 # we can use aws s3 cp commands here to copy entire python repo to an existing s3 bucket.
 # or create pipeline using aws-codepipeline and create a s3 deploy action

@@ -11,6 +11,7 @@ def lambda_handler(event, context):
         'body': d_mul(2, 3)
     }
 
+
 def lambda_handler2(event, context):
     """
     dummy string

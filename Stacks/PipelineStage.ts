@@ -2,6 +2,7 @@ import { Environment, Stage, StageProps } from "aws-cdk-lib";
 import { Construct } from "constructs";
 import { LambdaStack } from "./LambdaStack";
 import { s3Stack } from "./s3Stack";
+import { GlueStack } from "./GlueStack";
 
 
 interface PipelineStageProps extends StageProps {
@@ -23,6 +24,11 @@ export class PipelineStage extends Stage {
             stageName: props.stageName,
             env: props.env
         })
+
+        new GlueStack(this, 'GlueStack', {
+            stageName: props.stageName,
+            env: props.env
+        });
 
     }
 }
