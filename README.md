@@ -43,7 +43,11 @@ Create a cicd pipeline template to deploy typical infra required for a DE projec
 
 2. When making any changes to pipeline, make sure to do cdk deploy pipeline stack from local first before commiting your changes to git. For some reason, the commands I add to synth steps will not run until I update the pipeline from local first.
 
-3. Lambda code can be referenced directly using local relative path. For Glue Job, all the required files, jars, additional py files must be copied to s3 using s3 bucket deployment.
+3. When attaching ecr repo to lambda, make sure to attach a dependency (deploy lambda only after local image is published to ecr repo), else lambda will fail.
+
+4. Lambda code can be referenced directly using local relative path. For Glue Job, all the required files, jars, additional py files must be copied to s3 using s3 bucket deployment.
+
+5. For Glue Jobs, additional py files must be zip containing only the code we develop. Do not include external python libraries in the zip. For external libraries, use addition python modules parameter instead. We can include external libraries in zip if they are pure python modules not native complied (eg: numpy uses C implementation, can not be used in zip)
 
 ## Issues
 

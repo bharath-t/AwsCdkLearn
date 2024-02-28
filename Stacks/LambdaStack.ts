@@ -111,7 +111,7 @@ export class LambdaStack extends Stack {
         const ecr_repo = new aws_ecr.Repository(this, 'CustomECRRepo', {
             repositoryName: 'testecrrepo',
             removalPolicy: RemovalPolicy.DESTROY,
-            autoDeleteImages: true,
+            emptyOnDelete: true,
             lifecycleRules: [LifecycleRule],
         });
 
