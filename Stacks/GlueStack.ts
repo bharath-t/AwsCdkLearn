@@ -8,6 +8,7 @@ interface GlueStackProps extends StackProps {
 }
 
 export class GlueStack extends Stack {
+    public glueJob: aws_glue.CfnJob;
     constructor(scope: Construct, id: string, props: GlueStackProps) {
         super(scope, id, props)
 
@@ -60,7 +61,7 @@ export class GlueStack extends Stack {
 
         // creating glue etl Job. based on usecase (python shell/ spark streaming / ray job), 
         // configure command section below
-        const glueJob = new aws_glue.CfnJob(this, 'GlueJob1', {
+        this.glueJob = new aws_glue.CfnJob(this, 'GlueJob1', {
             name: `glue_test1_${props.stageName}`,
             role: glue_role.roleName,
             command: {

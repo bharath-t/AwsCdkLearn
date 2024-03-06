@@ -8,7 +8,8 @@ def lambda_handler(event, context):
     print(event, context)
     return {
         'statusCode': 200,
-        'body': d_sum(1, 2)
+        'body': d_sum(1, 2),
+        'lambda1output1': 1,
     }
 
 

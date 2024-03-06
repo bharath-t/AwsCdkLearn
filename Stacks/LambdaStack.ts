@@ -118,7 +118,7 @@ export class LambdaStack extends Stack {
 
         const LifecycleRule = {
             tagStatus: aws_ecr.TagStatus.ANY,
-            description: 'Delete more than 5 image',
+            description: 'Delete more than 3 image',
             maxImageCount: 3,
         }
 

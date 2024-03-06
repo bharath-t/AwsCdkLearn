@@ -14,7 +14,7 @@ COPY requirements.txt requirements.txt
 RUN pip install -r requirements.txt
 
 # copy contents of root python folder to /app folder
-COPY . /app
+COPY . .
 
 # For Lambda
 COPY requirements.txt ${LAMBDA_TASK_ROOT}
