@@ -116,33 +116,43 @@ export class LambdaStack extends Stack {
             filters: [{ prefix: 'input_data/' }],
         }));
 
+        const lambdaFailuresTopic = new Topic(this, 'lambdaFailuresTopic', {
+            topicName: `lambdaFailure-${props.stageName}`,
+        });
+        lambdaFailuresTopic.addSubscription(new EmailSubscription('bharath2792@gmail.com'));
+
+
+        // adding alarm on lambda errors
+        // use lambdaaction instead of snsaction for pager integration
+        const lambdaAlarm = new Alarm(this, 'LambdaErrorAlarm', {
+            metric: this.dockerimagelambda2.metricErrors(),
+            threshold: 1,
+            evaluationPeriods: 1,
+            comparisonOperator: ComparisonOperator.GREATER_THAN_OR_EQUAL_TO_THRESHOLD,
+        });
+        lambdaAlarm.addAlarmAction(new SnsAction(lambdaFailuresTopic));
+
+
 
         // create ecr repo, publish local docker image to ecr
         // publishing docker image asset to ecr is a 3rd party library(cdk - ecr - deployment) feature.use with caution
         // ref: https://docs.aws.amazon.com/cdk/api/v2/docs/aws-cdk-lib.aws_ecr_assets-readme.html
 
-        const LifecycleRule = {
-            tagStatus: aws_ecr.TagStatus.ANY,
-            description: 'Delete more than 3 image',
-            maxImageCount: 3,
-        }
-
         const ecr_repo = new aws_ecr.Repository(this, 'CustomECRRepo', {
             repositoryName: 'testecrrepo',
             removalPolicy: RemovalPolicy.DESTROY,
             emptyOnDelete: true,
-            lifecycleRules: [LifecycleRule],
         });
 
         const imageAsset = new aws_ecr_assets.DockerImageAsset(this, 'EcrAsset', {
             directory: path.join(__dirname, '../python_scripts'),
+            cacheDisabled: true,
         });
 
         const ecr_deploy = new ecrdeploy.ECRDeployment(this, 'DeployDockerImage', {
             src: new ecrdeploy.DockerImageName(imageAsset.imageUri),
             dest: new ecrdeploy.DockerImageName(ecr_repo.repositoryUri),
         });
-
 
         // create lambda using ecr repo
         handler_name = 'lambda2';
@@ -164,22 +174,6 @@ export class LambdaStack extends Stack {
 
         // make sure image is published to ecr before lambda creation
         this.dockerecrlambda.node.addDependency(ecr_deploy)
-
-        const lambdaFailuresTopic = new Topic(this, 'lambdaFailuresTopic', {
-            topicName: `lambdaFailure-${props.stageName}`,
-        });
-        lambdaFailuresTopic.addSubscription(new EmailSubscription('bharath2792@gmail.com'));
-
-
-        // adding alarm on lambda errors
-        // use lambdaaction instead of snsaction for pager integration
-        const lambdaAlarm = new Alarm(this, 'LambdaErrorAlarm', {
-            metric: this.dockerecrlambda.metricErrors(),
-            threshold: 1,
-            evaluationPeriods: 1,
-            comparisonOperator: ComparisonOperator.GREATER_THAN_THRESHOLD,
-        });
-        lambdaAlarm.addAlarmAction(new SnsAction(lambdaFailuresTopic));
 
 
     }
