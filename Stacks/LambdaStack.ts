@@ -5,6 +5,11 @@ import { Construct } from "constructs";
 import * as path from 'path';
 import * as ecrdeploy from "cdk-ecr-deployment";
 import { S3EventSourceV2 } from 'aws-cdk-lib/aws-lambda-event-sources';
+import { Alarm, ComparisonOperator } from "aws-cdk-lib/aws-cloudwatch";
+import { LambdaAction, SnsAction } from "aws-cdk-lib/aws-cloudwatch-actions";
+import { Topic } from "aws-cdk-lib/aws-sns";
+import { EmailSubscription } from "aws-cdk-lib/aws-sns-subscriptions";
+
 
 interface LambdaStackProps extends StackProps {
     stageName: string,
@@ -159,6 +164,23 @@ export class LambdaStack extends Stack {
 
         // make sure image is published to ecr before lambda creation
         this.dockerecrlambda.node.addDependency(ecr_deploy)
+
+        const lambdaFailuresTopic = new Topic(this, 'lambdaFailuresTopic', {
+            topicName: `lambdaFailure-${props.stageName}`,
+        });
+        lambdaFailuresTopic.addSubscription(new EmailSubscription('bharath2792@gmail.com'));
+
+
+        // adding alarm on lambda errors
+        // use lambdaaction instead of snsaction for pager integration
+        const lambdaAlarm = new Alarm(this, 'LambdaErrorAlarm', {
+            metric: this.dockerecrlambda.metricErrors(),
+            threshold: 1,
+            evaluationPeriods: 1,
+            comparisonOperator: ComparisonOperator.GREATER_THAN_THRESHOLD,
+        });
+        lambdaAlarm.addAlarmAction(new SnsAction(lambdaFailuresTopic));
+
 
     }
 }
