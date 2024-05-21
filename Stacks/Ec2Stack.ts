@@ -2,6 +2,7 @@ import { Environment, Stack, StackProps, aws_iam, aws_ecr_assets, CfnOutput, Rem
 import { Construct } from "constructs";
 import * as path from 'path';
 import * as ecrdeploy from "cdk-ecr-deployment";
+import { Effect } from "aws-cdk-lib/aws-iam";
 
 
 interface Ec2StackProps extends StackProps {
@@ -53,9 +54,19 @@ export class Ec2Stack extends Stack {
             managedPolicies: [
                 aws_iam.ManagedPolicy.fromAwsManagedPolicyName('AmazonS3FullAccess'),
                 aws_iam.ManagedPolicy.fromAwsManagedPolicyName('AmazonSSMManagedInstanceCore'),
-                aws_iam.ManagedPolicy.fromAwsManagedPolicyName('AWSAppRunnerServicePolicyForECRAccess'),
             ],
         });
+
+        // custom policy to pull images from ecr
+        const custom_ecr_policy = new aws_iam.PolicyStatement({
+            actions: ["ecr:GetDownloadUrlForLayer", "ecr:BatchGetImage", "ecr:DescribeImages",
+                "ecr:GetAuthorizationToken", "ecr:BatchCheckLayerAvailability"],
+            resources: ['*'],
+            effect: Effect.ALLOW,
+        });
+        this.ec2_role.addToPolicy(custom_ecr_policy);
+
+
 
         // needed only for ec2, ec2servicerole of emr
         this.ec2_instanceProfile = new aws_iam.InstanceProfile(this, 'Ec2InstanceProfile', {
@@ -79,6 +90,9 @@ export class Ec2Stack extends Stack {
             `docker pull ${props.env.account}.dkr.ecr.${props.env.region}.amazonaws.com/ec2ecsrepo:latest`
         );
         // sudo docker run -v ~/.aws:/root/.aws 415283085407.dkr.ecr.us-east-1.amazonaws.com/ec2ecsrepo:latest python3 process.py
+
+
+        // commenting as the use case is tested, was able to trigger python scripts using above docker command.
 
         const ec2Instance = new aws_ec2.Instance(this, 'EC2Instance', {
             instanceType: aws_ec2.InstanceType.of(aws_ec2.InstanceClass.T2, aws_ec2.InstanceSize.MICRO),
