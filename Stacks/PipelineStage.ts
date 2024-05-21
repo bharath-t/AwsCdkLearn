@@ -4,6 +4,7 @@ import { LambdaStack } from "./LambdaStack";
 import { s3Stack } from "./s3Stack";
 import { GlueStack } from "./GlueStack";
 import { StepFunctionStack } from "./StepFunctionStack";
+import { Ec2Stack } from "./Ec2Stack";
 
 
 interface PipelineStageProps extends StageProps {
@@ -46,6 +47,11 @@ export class PipelineStage extends Stage {
         // deploy step function only after glue, lambda stack are deployed
         sfn_stack.node.addDependency(lambda_stack);
         sfn_stack.node.addDependency(glue_stack);
+
+        const ec2_stack = new Ec2Stack(this, 'Ec2Stack', {
+            stageName: props.stageName,
+            env: props.env,
+        });
 
     }
 }

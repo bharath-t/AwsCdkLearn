@@ -1,4 +1,4 @@
-import { Duration, Environment, Fn, Stack, StackProps, aws_iam } from "aws-cdk-lib";
+import { Duration, Environment, Fn, Stack, StackProps, aws_iam, CfnOutput } from "aws-cdk-lib";
 import { aws_lambda, aws_ecr, aws_ecr_assets, RemovalPolicy, aws_s3 } from "aws-cdk-lib";
 import { Effect } from "aws-cdk-lib/aws-iam";
 import { Construct } from "constructs";
@@ -137,9 +137,9 @@ export class LambdaStack extends Stack {
         // create ecr repo, publish local docker image to ecr
         // publishing docker image asset to ecr is a 3rd party library(cdk - ecr - deployment) feature.use with caution
         // ref: https://docs.aws.amazon.com/cdk/api/v2/docs/aws-cdk-lib.aws_ecr_assets-readme.html
-
+        const repoName = 'lambdaecrrepo';
         const ecr_repo = new aws_ecr.Repository(this, 'CustomECRRepo', {
-            repositoryName: 'testecrrepo',
+            repositoryName: repoName,
             removalPolicy: RemovalPolicy.DESTROY,
             emptyOnDelete: true,
         });
@@ -149,6 +149,8 @@ export class LambdaStack extends Stack {
             cacheDisabled: true,
         });
 
+
+
         const ecr_deploy = new ecrdeploy.ECRDeployment(this, 'DeployDockerImage', {
             src: new ecrdeploy.DockerImageName(imageAsset.imageUri),
             dest: new ecrdeploy.DockerImageName(ecr_repo.repositoryUri),
@@ -157,7 +159,7 @@ export class LambdaStack extends Stack {
         // create lambda using ecr repo
         handler_name = 'lambda2';
         handler_fname = 'lambda_handler2';
-        this.dockerecrlambda = new aws_lambda.DockerImageFunction(this, 'EcrAssetFunction', {
+        const dockerecrlambda = new aws_lambda.DockerImageFunction(this, 'EcrAssetFunction', {
             code: aws_lambda.DockerImageCode.fromEcr(ecr_repo, {
                 cmd: [`src.${handler_name}.${handler_fname}`],
             }),
@@ -173,8 +175,8 @@ export class LambdaStack extends Stack {
         });
 
         // make sure image is published to ecr before lambda creation
-        this.dockerecrlambda.node.addDependency(ecr_deploy)
-
+        dockerecrlambda.node.addDependency(ecr_deploy);
+        this.dockerecrlambda = dockerecrlambda;
 
     }
 }
