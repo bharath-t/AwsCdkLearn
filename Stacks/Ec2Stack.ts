@@ -87,25 +87,25 @@ export class Ec2Stack extends Stack {
             'service docker start',
             'usermod -a -G docker ec2-user',
             `aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${props.env.account}.dkr.ecr.${props.env.region}.amazonaws.com`,
-            `docker pull ${props.env.account}.dkr.ecr.${props.env.region}.amazonaws.com/ec2ecsrepo:latest`
+            `docker pull ${props.env.account}.dkr.ecr.${props.env.region}.amazonaws.com/${repoName}:latest`
         );
         // sudo docker run -v ~/.aws:/root/.aws 415283085407.dkr.ecr.us-east-1.amazonaws.com/ec2ecsrepo:latest python3 process.py
 
 
         // commenting as the use case is tested, was able to trigger python scripts using above docker command.
 
-        const ec2Instance = new aws_ec2.Instance(this, 'EC2Instance', {
-            instanceType: aws_ec2.InstanceType.of(aws_ec2.InstanceClass.T2, aws_ec2.InstanceSize.MICRO),
-            machineImage: aws_ec2.MachineImage.latestAmazonLinux2023({
-                cachedInContext: true,
-            }),
-            vpc: aws_ec2.Vpc.fromLookup(this, 'VPC', { isDefault: true }),
-            role: this.ec2_role,
-            userData: userDataScript,
-            userDataCausesReplacement: true,
-            ssmSessionPermissions: true,
-        });
-        ec2Instance.node.addDependency(ecr_deploy);
+        // const ec2Instance = new aws_ec2.Instance(this, 'EC2Instance', {
+        //     instanceType: aws_ec2.InstanceType.of(aws_ec2.InstanceClass.T2, aws_ec2.InstanceSize.MICRO),
+        //     machineImage: aws_ec2.MachineImage.latestAmazonLinux2023({
+        //         cachedInContext: true,
+        //     }),
+        //     vpc: aws_ec2.Vpc.fromLookup(this, 'VPC', { isDefault: true }),
+        //     role: this.ec2_role,
+        //     userData: userDataScript,
+        //     userDataCausesReplacement: true,
+        //     ssmSessionPermissions: true,
+        // });
+        // ec2Instance.node.addDependency(ecr_deploy);
 
     }
 }

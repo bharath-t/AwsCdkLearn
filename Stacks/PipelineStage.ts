@@ -5,6 +5,7 @@ import { s3Stack } from "./s3Stack";
 import { GlueStack } from "./GlueStack";
 import { StepFunctionStack } from "./StepFunctionStack";
 import { Ec2Stack } from "./Ec2Stack";
+import { EcsStack } from "./EcsStack";
 
 
 interface PipelineStageProps extends StageProps {
@@ -51,6 +52,11 @@ export class PipelineStage extends Stage {
         const ec2_stack = new Ec2Stack(this, 'Ec2Stack', {
             stageName: props.stageName,
             env: props.env,
+        });
+
+        const ecs_stack = new EcsStack(this, 'EcsStack', {
+            stageName: props.stageName,
+            env: props.env
         });
 
     }

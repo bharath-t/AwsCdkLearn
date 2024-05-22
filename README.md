@@ -57,7 +57,9 @@ Create a cicd pipeline template to deploy typical infra required for a DE projec
 
 9. When creating docker image, specify the platform in dockerimageasset construct. this should match with platform of ec2 you deploy it on.
 
-10. boto3, awscli clients on EC2 get access via instance profile. docker container clients does not get access by default. either attach aws creds file as volume to container using -v argument, else pass AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY as env variable to container using -e argument or using aws cli, get values from secrets manager, pass as env variables. On ecs, we can specify iam roles at container level.
+10. boto3, awscli clients on EC2 get access via instance profile. docker container clients does not get access by default. either attach aws creds file as volume to container using -v argument, else pass AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY as env variable to container using -e argument or using aws cli, get values from secrets manager, pass as env variables. On ecs, we can specify iam roles at container level (task role NOT task execution role).
+
+11. for docker image/ecr on ecs, dont forget to specify entry point in dockerfile. else when you pass executable parm1 as command (eg: python3 abc.py), ecs will not be able to find where python exists and retuns no executable found error. set entrypoint as python in dockerfile, pass only abc.py as command to container.
 
 ## Issues
 

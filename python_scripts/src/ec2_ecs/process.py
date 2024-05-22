@@ -1,6 +1,6 @@
+import ast
 from Transformer import Transformer
 import sys
-import json
 
 def process(input_dict):
     transformer = Transformer(input_dict)
@@ -16,7 +16,8 @@ if __name__ == '__main__':
 
     if len(sys.argv) > 1:
         input_dict_string = sys.argv[1]
-        input_dict = json.loads(input_dict_string)
+        # input_dict = json.loads(input_dict_string)
+        input_dict = ast.literal_eval(input_dict_string)
     # argv[0] will be current file name always
 
     process(input_dict)
